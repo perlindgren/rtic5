@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, TokenStream as TokenStream2};
-use quote::{format_ident, quote, ToTokens};
+use quote::{format_ident, quote};
 
 use rtic_core::{AppArgs, RticMacroBuilder, StandardPassImpl, SubAnalysis, SubApp};
 use syn::{parse_quote, ItemFn};
@@ -9,10 +9,13 @@ extern crate proc_macro;
 
 struct HippoRtic;
 
+#[cfg(feature = "deadline-pass")]
 use rtic_deadline_pass::{DeadlineToPriorityPass /* DeadlineToPriorityPassImpl */};
+
 use rtic_sw_pass::{SoftwarePass, SoftwarePassImpl};
 
 const MIN_TASK_PRIORITY: u16 = 0; // lowest hippo priority
+#[cfg(feature = "deadline-pass")]
 const MAX_TASK_PRIORITY: u16 = 3; // highest hippo priority
 
 #[proc_macro_attribute]
@@ -20,11 +23,15 @@ pub fn app(args: TokenStream, input: TokenStream) -> TokenStream {
     // use the standard software pass provided by rtic-sw-pass crate
     let sw_pass = SoftwarePass::new(SwPassBackend);
     // use the standard deadline to priority pass provided bp the rtic-deadline-pass crate
+    #[cfg(feature = "deadline-pass")]
     let deadline_pass = DeadlineToPriorityPass::new(MAX_TASK_PRIORITY);
 
     let mut builder = RticMacroBuilder::new(HippoRtic);
-    builder.bind_pre_std_pass(deadline_pass); // run deadline to priority pass first
-    println!("--- deadline pass added --- ");
+    #[cfg(feature = "deadline-pass")]
+    {
+        builder.bind_pre_std_pass(deadline_pass); // run deadline to priority pass first
+        println!("--- deadline pass added --- ");
+    }
     builder.bind_pre_std_pass(sw_pass); // run software pass second
     builder.build_rtic_macro(args, input)
 }
@@ -134,7 +141,7 @@ impl SoftwarePassImpl for SwPassBackend {
     }
 
     /// Provide the implementation/body of the cross-core interrupt pending function.
-    fn impl_cross_pend_fn(&self, mut empty_body_fn: ItemFn) -> Option<ItemFn> {
+    fn impl_cross_pend_fn(&self, _empty_body_fn: ItemFn) -> Option<ItemFn> {
         None
     }
 }

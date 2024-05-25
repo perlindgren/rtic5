@@ -17,3 +17,6 @@ rtic-deadline-pass = { path = "../rtic-deadline-pass", default-features = false 
 
 #nb = "0.1.1"
 hippomenes-core = { git = "https://github.com/onsdagens/hippomenes-core" }
+
+[features]
+deadline-pass = ["rtic-macro/deadline-pass"]
