@@ -1,8 +1,10 @@
 {
   "cSpell.ignoreWords": [
     "Newtype",
+    "codegen",
     "mintthresh",
     "riscv",
-    "rtic"
+    "rtic",
+    "strct"
   ]
 }

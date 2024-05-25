@@ -1,5 +1,5 @@
 [package]
-name = "rtic-sw-pass"
+name = "rtic-deadline-pass"
 version = "0.1.0"
 edition = "2021"
 
@@ -14,7 +14,7 @@ syn = { version = "2.0.53", features = [
     "full",
 ], optional = true }
 rtic-core = { path = "../rtic-core", optional = true }
-rtic-spsc = { path = "../rtic-spsc" }
+# rtic-spsc = { path = "../rtic-spsc" }
 
 [features]
 std = ["dep:heck", "dep:proc-macro2", "dep:quote", "dep:syn", "dep:rtic-core"]

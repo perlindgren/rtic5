@@ -9,17 +9,22 @@ extern crate proc_macro;
 
 struct HippoRtic;
 
+use rtic_deadline_pass::{DeadlineToPriorityPass /* DeadlineToPriorityPassImpl */};
 use rtic_sw_pass::{SoftwarePass, SoftwarePassImpl};
 
-const MIN_TASK_PRIORITY: u16 = 0; // lowest hippo prio
-                                  // const MAX_TASK_PRIORITY: u16 = 3;
+const MIN_TASK_PRIORITY: u16 = 0; // lowest hippo priority
+const MAX_TASK_PRIORITY: u16 = 3; // highest hippo priority
 
 #[proc_macro_attribute]
 pub fn app(args: TokenStream, input: TokenStream) -> TokenStream {
     // use the standard software pass provided by rtic-sw-pass crate
     let sw_pass = SoftwarePass::new(SwPassBackend);
+    // use the standard deadline to priority pass provided bp the rtic-deadline-pass crate
+    let deadline_pass = DeadlineToPriorityPass::new(MAX_TASK_PRIORITY);
 
     let mut builder = RticMacroBuilder::new(HippoRtic);
+    builder.bind_pre_std_pass(deadline_pass); // run deadline to priority pass first
+    println!("--- deadline pass added --- ");
     builder.bind_pre_std_pass(sw_pass); // run software pass second
     builder.build_rtic_macro(args, input)
 }
