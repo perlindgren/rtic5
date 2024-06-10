@@ -59,9 +59,9 @@ pub unsafe fn lock<T, R>(ptr: *mut T, priority: u8, ceiling: u8, f: impl FnOnce(
     if priority < ceiling {
         // priority.set(ceiling);
 
-        mintthresh::Priority::write(ceiling as usize);
+        mintthresh::Bits::write(ceiling as usize);
         let r = f(&mut *ptr);
-        mintthresh::Priority::write(priority as usize);
+        mintthresh::Bits::write(priority as usize);
         // priority.set(current);
         r
     } else {
